@@ -1,35 +1,38 @@
 from datetime import date
 
 
-def calculate_age(birth_year: int, birth_month: int, birth_day: int) -> int:
+def calculate_age(birth_date: date) -> int:
     today = date.today()
-    age = today.year - birth_year
-    if (today.month, today.day) < (birth_month, birth_day):
+    age = today.year - birth_date.year
+    if (today.month, today.day) < (birth_date.month, birth_date.day):
         age -= 1
     return age
 
 
-def get_int(prompt: str) -> int:
-    while True:
-        try:
-            value = int(input(prompt))
-            return value
-        except ValueError:
-            print("Please enter a valid number.")
+def parse_birth_date(input_text: str) -> date:
+    year_str, month_str, day_str = input_text.split("-")
+    year = int(year_str)
+    month = int(month_str)
+    day = int(day_str)
+    return date(year, month, day)
 
 
 def main() -> None:
     print("Age Calculator")
-    print("Enter your date of birth:")
-    year = get_int("Year (YYYY): ")
-    month = get_int("Month (1-12): ")
-    day = get_int("Day (1-31): ")
+    print("Enter your date of birth in YYYY-MM-DD format:")
 
-    try:
-        age = calculate_age(year, month, day)
-        print(f"You are {age} years old.")
-    except ValueError as error:
-        print(f"Invalid date: {error}")
+    while True:
+        raw_input = input("Date of birth: ")
+        try:
+            birth_date = parse_birth_date(raw_input.strip())
+            if birth_date > date.today():
+                print("The birth date cannot be in the future. Try again.")
+                continue
+            age = calculate_age(birth_date)
+            print(f"You are {age} years old.")
+            break
+        except ValueError:
+            print("Please enter a valid date in YYYY-MM-DD format.")
 
 
 if __name__ == "__main__":
