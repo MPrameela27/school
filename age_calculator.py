@@ -1,12 +1,25 @@
 from datetime import date
+import calendar
 
 
-def calculate_age(birth_date: date) -> int:
+def calculate_age_components(birth_date: date) -> tuple[int, int, int]:
     today = date.today()
-    age = today.year - birth_date.year
-    if (today.month, today.day) < (birth_date.month, birth_date.day):
-        age -= 1
-    return age
+    years = today.year - birth_date.year
+    months = today.month - birth_date.month
+    days = today.day - birth_date.day
+
+    if days < 0:
+        months -= 1
+        prev_month = today.month - 1 or 12
+        prev_year = today.year if today.month != 1 else today.year - 1
+        days_in_prev_month = calendar.monthrange(prev_year, prev_month)[1]
+        days += days_in_prev_month
+
+    if months < 0:
+        years -= 1
+        months += 12
+
+    return years, months, days
 
 
 def parse_birth_date(input_text: str) -> date:
@@ -28,8 +41,8 @@ def main() -> None:
             if birth_date > date.today():
                 print("The birth date cannot be in the future. Try again.")
                 continue
-            age = calculate_age(birth_date)
-            print(f"You are {age} years old.")
+            years, months, days = calculate_age_components(birth_date)
+            print(f"You are {years} years, {months} months, and {days} days old.")
             break
         except ValueError:
             print("Please enter a valid date in YYYY-MM-DD format.")
